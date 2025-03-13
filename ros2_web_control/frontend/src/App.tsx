@@ -1,12 +1,14 @@
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import CmdVelControlPage from "./componets/pages/CmdVelControlPage/CmdVelControlPage"
 
 function App() {
-
   return (
-    <>
-      <h1>Hello world</h1>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<CmdVelControlPage />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
