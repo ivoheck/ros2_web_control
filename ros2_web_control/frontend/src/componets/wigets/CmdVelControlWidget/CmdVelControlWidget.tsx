@@ -95,34 +95,34 @@ function CmdVelControlWidget() {
                     </button>
 
                     <button className="grid-item"
-                        onMouseDown={() => handleMouseDown(-1)}
-                        onMouseUp={() => handleMouseUp()}
-                        onMouseLeave={() => handleMouseLeave()}>
-                    </button>
-
-                    <button className="grid-item"
                         onMouseDown={() => handleMouseDown(5)}
                         onMouseUp={() => handleMouseUp()}
                         onMouseLeave={() => handleMouseLeave()}>
-                        <div className="arrow arrow-right"></div>
                     </button>
 
                     <button className="grid-item"
                         onMouseDown={() => handleMouseDown(6)}
                         onMouseUp={() => handleMouseUp()}
                         onMouseLeave={() => handleMouseLeave()}>
-                        <div className="arrow arrow-down-left"></div>
+                        <div className="arrow arrow-right"></div>
                     </button>
 
                     <button className="grid-item"
                         onMouseDown={() => handleMouseDown(7)}
                         onMouseUp={() => handleMouseUp()}
                         onMouseLeave={() => handleMouseLeave()}>
-                        <div className="arrow arrow-down"></div>
+                        <div className="arrow arrow-down-left"></div>
                     </button>
 
                     <button className="grid-item"
                         onMouseDown={() => handleMouseDown(8)}
+                        onMouseUp={() => handleMouseUp()}
+                        onMouseLeave={() => handleMouseLeave()}>
+                        <div className="arrow arrow-down"></div>
+                    </button>
+
+                    <button className="grid-item"
+                        onMouseDown={() => handleMouseDown(9)}
                         onMouseUp={() => handleMouseUp()}
                         onMouseLeave={() => handleMouseLeave()}>
                         <div className="arrow arrow-down-right"></div>
