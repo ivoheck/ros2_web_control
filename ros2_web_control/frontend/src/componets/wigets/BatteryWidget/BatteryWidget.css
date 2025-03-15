@@ -1,0 +1,25 @@
+.battery-widget {
+}
+
+.battery-icon {
+  font-size: 200px;
+  position: relative;
+}
+
+.battery-details {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.battery-details td {
+  font-size: 20px;
+  padding: 10px;
+}
+
+.battery-details .left {
+  text-align: left;
+}
+
+.battery-details .right {
+  text-align: right;
+}

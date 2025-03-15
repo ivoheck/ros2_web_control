@@ -10,7 +10,6 @@ function CmdVelControlWidget() {
 
         if (currentPress !== -1) {
             intervalId = setInterval(() => {
-                console.log(`Sending key ${currentPress} to backend`);
 
                 const buttonKey = {
                     key: currentPress
@@ -24,11 +23,9 @@ function CmdVelControlWidget() {
                     body: JSON.stringify(buttonKey),
                 })
                     .then(response => response.json())
-                    .then(data => {
-                        console.log("Server-Antwort:", data);
-                    })
+
                     .catch(error => {
-                        console.error("Fehler beim Senden der Anfrage:", error);
+                        console.error("Error:", error);
                     });
 
             }, 100);
