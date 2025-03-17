@@ -8,7 +8,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<CmdVelControlPage />} />
+        <Route path="/page" element={<CmdVelControlPage />} />
         <Route path="/battery" element={<BatteryPage />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/camera" element={<CameraPage />} />

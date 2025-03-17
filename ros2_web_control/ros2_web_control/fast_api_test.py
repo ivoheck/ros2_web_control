@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import threading
 import uvicorn
 from contextlib import asynccontextmanager
@@ -11,7 +12,6 @@ from geometry_msgs.msg import Twist
 from rclpy.node import Node
 from sensor_msgs.msg import BatteryState
 from nav_msgs.msg import OccupancyGrid
-
 
 #ROS 2 Node
 class WebBrige(Node):
@@ -69,8 +69,6 @@ class WebBrige(Node):
         
         return msg
 
-
-# API Models
 class CmdVelButtonKey(BaseModel):
     key: int
 
@@ -100,23 +98,16 @@ async def lifespan(app: FastAPI):
     thread = threading.Thread(target=ros_thread)
     thread.start()
 
+    app.state.ros_node = ros_node
+
     yield
 
     # Shutdown logic
     rclpy.shutdown()
 
-
-# Fast API
-class Backend():
+class Backend:
     def __init__(self):
-        self.app = FastAPI()
-
-        app_path = "./../frontend/dist"
-        self.app.mount("/", StaticFiles(directory=app_path, html=True), name="react-app")
-
-        origins = [
-            "http://localhost:5173",  
-        ]
+        self.app = FastAPI(lifespan=lifespan)
 
         self.app.add_middleware(
             CORSMiddleware,
@@ -126,53 +117,46 @@ class Backend():
             allow_headers=["*"],  
         )
 
-        self.ros_node = None
+        app_path = "./../frontend/dist"
+        self.app.mount("/page/", StaticFiles(directory=app_path, html=True), name="react-app")
 
-        # Get battery state from backend
-        @self.app.get("/get_battery_state")
-        async def read_root():
 
-            batteryState = BatteryState(
-                voltage=self.ros_node.battery_state.voltage or 0.0,
-                percentage=self.ros_node.battery_state.percentage or 0.0,
-                current=self.ros_node.battery_state.current or 0.0,
-                charge=self.ros_node.battery_state.charge or 0.0,
-                capacity=self.ros_node.battery_state.capacity or 0.0,
-                design_capacity=self.ros_node.battery_state.design_capacity or 0.0
-            )
-
-            return batteryState
-        
-        # Get map from backend
-        @self.app.get("/get_map")
-        async def read_root():
-
-            map = Map(
-                data=self.ros_node.map.data,
-                width=self.ros_node.map.info.width,
-                height=self.ros_node.map.info.height,
-                resolution=self.ros_node.map.info.resolution
-            )
-
-            return map
-
-        # Get cmd vel commands from frontend
+        # Routen in der Klasse definieren
         @self.app.post("/cmd_vel_button_key/")
         async def read_root(cmd_vel_button_key: CmdVelButtonKey):
-            self.ros_node.logger.info(f"Received key: {cmd_vel_button_key.key}")
-            self.ros_node.publish_message(self.ros_node.get_twist_msg(cmd_vel_button_key.key, 0.5))
-            # return {"message": "Received key successfully", "key": cmd_vel_button_key.key}
+            ros_node = self.app.state.ros_node
+            ros_node.logger.info(f"Received key: {cmd_vel_button_key.key}")
+            ros_node.publish_message(ros_node.get_twist_msg(cmd_vel_button_key.key, 0.5))
+            return {"message": "Received key successfully", "key": cmd_vel_button_key.key}
+        
 
+        # Get map from backend
+        @self.app.get("/get_map/")
+        async def read_root():
+            map = self.app.state.ros_node.map
+            return_map = None
+
+            print(map)
+            
+            # if map is None:
+            #     return {"message": "No map available"}
+            if map is not None:
+                
+                return_map = Map(
+                    data=map.data,
+                    width=map.info.width or 0,
+                    height=map.info.height or 0,
+                    resolution=map.info.resolution or 0.0
+                )
+
+            return return_map
 
     def run(self, host="0.0.0.0", port=8000):
-        # Starten des FastAPI Servers
         uvicorn.run(self.app, host=host, port=port)
-
 
 def main():
     backend = Backend()
     backend.run()
 
-# Run the FastAPI app
 if __name__ == "__main__":
     main()

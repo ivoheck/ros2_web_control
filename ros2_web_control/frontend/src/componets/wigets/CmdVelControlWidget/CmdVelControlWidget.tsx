@@ -4,56 +4,39 @@ import { useState, useEffect } from 'react';
 function CmdVelControlWidget() {
 
     const [currentPress, setIsPressed] = useState(-1);
+    const backendURL = window.location.origin;
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout | null = null;
 
         if (currentPress !== -1) {
             intervalId = setInterval(() => {
-
-                const buttonKey = {
-                    key: currentPress
-                };
-
-                fetch("http://127.0.0.1:8000/cmd_vel_button_key/", {
+                fetch(`${backendURL}/cmd_vel_button_key/`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(buttonKey),
-                })
-                    .then(response => response.json())
-
-                    .catch(error => {
-                        console.error("Error:", error);
-                    });
-
+                    body: JSON.stringify({ key: currentPress }),
+                }).catch(error => console.error("Error:", error));
             }, 100);
-        } else {
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
         }
 
-        // Cleanup
         return () => {
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
+            if (intervalId) clearInterval(intervalId);
         };
     }, [currentPress]);
 
-    const handleMouseDown = (key: number) => {
+    const handleEventDown = (key: number) => {
         console.log("Mouse Down");
         setIsPressed(key);
     }
 
-    const handleMouseUp = () => {
+    const handleEventUp = () => {
         console.log("Mouse Up");
         setIsPressed(-1);
     };
 
-    const handleMouseLeave = () => {
+    const handleEventLeave = () => {
         console.log("Mouse Leave");
         setIsPressed(-1);
     };
@@ -63,65 +46,103 @@ function CmdVelControlWidget() {
             <div className="container">
                 <div className="grid-container">
                     <button className="grid-item"
-                        onMouseDown={() => handleMouseDown(1)}
-                        onMouseUp={() => handleMouseUp()}
-                        onMouseLeave={() => handleMouseLeave()}>
+                        onMouseDown={() => handleEventDown(1)}
+                        onMouseUp={() => handleEventUp()}
+                        onMouseLeave={() => handleEventLeave()}
+
+                        onTouchStart={() => handleEventDown(1)}
+                        onTouchEnd={() => handleEventUp()}
+                        onTouchCancel={() => handleEventLeave()}>
                         <div className="arrow arrow-up-left"></div>
                     </button>
 
                     <button
                         className="grid-item"
-                        onMouseDown={() => handleMouseDown(2)}
-                        onMouseUp={() => handleMouseUp()}
-                        onMouseLeave={() => handleMouseLeave()}>
+                        onMouseDown={() => handleEventDown(2)}
+                        onMouseUp={() => handleEventUp()}
+                        onMouseLeave={() => handleEventLeave()}
+
+                        onTouchStart={() => handleEventDown(2)}
+                        onTouchEnd={() => handleEventUp()}
+                        onTouchCancel={() => handleEventLeave()}>
                         <div className="arrow arrow-up"></div>
                     </button>
 
                     <button className="grid-item"
-                        onMouseDown={() => handleMouseDown(3)}
-                        onMouseUp={() => handleMouseUp()}
-                        onMouseLeave={() => handleMouseLeave()}>
+                        onMouseDown={() => handleEventDown(3)}
+                        onMouseUp={() => handleEventUp()}
+                        onMouseLeave={() => handleEventLeave()}
+
+                        onTouchStart={() => handleEventDown(3)}
+                        onTouchEnd={() => handleEventUp()}
+                        onTouchCancel={() => handleEventLeave()}
+                    >
                         <div className="arrow arrow-up-right"></div>
                     </button>
 
                     <button className="grid-item"
-                        onMouseDown={() => handleMouseDown(4)}
-                        onMouseUp={() => handleMouseUp()}
-                        onMouseLeave={() => handleMouseLeave()}>
+                        onMouseDown={() => handleEventDown(4)}
+                        onMouseUp={() => handleEventUp()}
+                        onMouseLeave={() => handleEventLeave()}
+
+                        onTouchStart={() => handleEventDown(4)}
+                        onTouchEnd={() => handleEventUp()}
+                        onTouchCancel={() => handleEventLeave()}
+                    >
                         <div className="arrow arrow-left"></div>
                     </button>
 
                     <button className="grid-item"
-                        onMouseDown={() => handleMouseDown(5)}
-                        onMouseUp={() => handleMouseUp()}
-                        onMouseLeave={() => handleMouseLeave()}>
+                        onMouseDown={() => handleEventDown(5)}
+                        onMouseUp={() => handleEventUp()}
+                        onMouseLeave={() => handleEventLeave()}
+
+                        onTouchStart={() => handleEventDown(5)}
+                        onTouchEnd={() => handleEventUp()}
+                        onTouchCancel={() => handleEventLeave()}>
                     </button>
 
                     <button className="grid-item"
-                        onMouseDown={() => handleMouseDown(6)}
-                        onMouseUp={() => handleMouseUp()}
-                        onMouseLeave={() => handleMouseLeave()}>
+                        onMouseDown={() => handleEventDown(6)}
+                        onMouseUp={() => handleEventUp()}
+                        onMouseLeave={() => handleEventLeave()}
+
+                        onTouchStart={() => handleEventDown(6)}
+                        onTouchEnd={() => handleEventUp()}
+                        onTouchCancel={() => handleEventLeave()}>
                         <div className="arrow arrow-right"></div>
                     </button>
 
                     <button className="grid-item"
-                        onMouseDown={() => handleMouseDown(7)}
-                        onMouseUp={() => handleMouseUp()}
-                        onMouseLeave={() => handleMouseLeave()}>
+                        onMouseDown={() => handleEventDown(7)}
+                        onMouseUp={() => handleEventUp()}
+                        onMouseLeave={() => handleEventLeave()}
+
+                        onTouchStart={() => handleEventDown(7)}
+                        onTouchEnd={() => handleEventUp()}
+                        onTouchCancel={() => handleEventLeave()}>
                         <div className="arrow arrow-down-left"></div>
                     </button>
 
                     <button className="grid-item"
-                        onMouseDown={() => handleMouseDown(8)}
-                        onMouseUp={() => handleMouseUp()}
-                        onMouseLeave={() => handleMouseLeave()}>
+                        onMouseDown={() => handleEventDown(8)}
+                        onMouseUp={() => handleEventUp()}
+                        onMouseLeave={() => handleEventLeave()}
+
+                        onTouchStart={() => handleEventDown(8)}
+                        onTouchEnd={() => handleEventUp()}
+                        onTouchCancel={() => handleEventLeave()}>
                         <div className="arrow arrow-down"></div>
                     </button>
 
                     <button className="grid-item"
-                        onMouseDown={() => handleMouseDown(9)}
-                        onMouseUp={() => handleMouseUp()}
-                        onMouseLeave={() => handleMouseLeave()}>
+                        onMouseDown={() => handleEventDown(9)}
+                        onMouseUp={() => handleEventUp()}
+                        onMouseLeave={() => handleEventLeave()}
+
+                        onTouchStart={() => handleEventDown(9)}
+                        onTouchEnd={() => handleEventUp()}
+                        onTouchCancel={() => handleEventLeave()}>
                         <div className="arrow arrow-down-right"></div>
                     </button>
                 </div>

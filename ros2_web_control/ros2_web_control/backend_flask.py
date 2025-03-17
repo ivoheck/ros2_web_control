@@ -1,11 +1,5 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
+from flask import Flask, jsonify, request
 import threading
-import uvicorn
-from contextlib import asynccontextmanager
-
 import rclpy
 from geometry_msgs.msg import Twist
 from rclpy.node import Node
@@ -14,7 +8,7 @@ from nav_msgs.msg import OccupancyGrid
 
 
 #ROS 2 Node
-class WebBrige(Node):
+class WebBridge(Node):
     def __init__(self):
         super().__init__('web_bridge')
         self.publisher_cmd_vel = self.create_publisher(Twist, '/cmd_vel_unstamped', 1)
@@ -71,10 +65,10 @@ class WebBrige(Node):
 
 
 # API Models
-class CmdVelButtonKey(BaseModel):
+class CmdVelButtonKey():
     key: int
 
-class BatteryState(BaseModel):
+class BatteryState():
     voltage: float
     percentage: float
     current: float
@@ -82,57 +76,25 @@ class BatteryState(BaseModel):
     capacity: float
     design_capacity: float
 
-class Map(BaseModel):
+class Map():
     data: list
     width: int
     height: int
     resolution: float
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup logic
-    rclpy.init()
-    ros_node = WebBrige()
-
-    def ros_thread():
-        rclpy.spin(ros_node)
-
-    thread = threading.Thread(target=ros_thread)
-    thread.start()
-
-    yield
-
-    # Shutdown logic
-    rclpy.shutdown()
-
-
-# Fast API
 class Backend():
     def __init__(self):
-        self.app = FastAPI()
-
-        app_path = "./../frontend/dist"
-        self.app.mount("/", StaticFiles(directory=app_path, html=True), name="react-app")
-
-        origins = [
-            "http://localhost:5173",  
-        ]
-
-        self.app.add_middleware(
-            CORSMiddleware,
-            allow_origins=["*"],  
-            allow_credentials=True,
-            allow_methods=["*"], 
-            allow_headers=["*"],  
-        )
-
+        self.app = Flask(__name__)
         self.ros_node = None
+        
+        # Wir verschieben den Decorator außerhalb der __init__-Methode
+        self.app.before_first_request(self.startup_event)
+        self.app.teardown_appcontext(self.shutdown_event)
 
         # Get battery state from backend
-        @self.app.get("/get_battery_state")
-        async def read_root():
-
-            batteryState = BatteryState(
+        @self.app.route("/get_battery_state", methods=["GET"])
+        def get_battery_state():
+            battery_state = BatteryState(
                 voltage=self.ros_node.battery_state.voltage or 0.0,
                 percentage=self.ros_node.battery_state.percentage or 0.0,
                 current=self.ros_node.battery_state.current or 0.0,
@@ -140,38 +102,55 @@ class Backend():
                 capacity=self.ros_node.battery_state.capacity or 0.0,
                 design_capacity=self.ros_node.battery_state.design_capacity or 0.0
             )
+            return jsonify(battery_state.dict())
 
-            return batteryState
-        
         # Get map from backend
-        @self.app.get("/get_map")
-        async def read_root():
-
-            map = Map(
+        @self.app.route("/get_map", methods=["GET"])
+        def get_map():
+            map_data = Map(
                 data=self.ros_node.map.data,
                 width=self.ros_node.map.info.width,
                 height=self.ros_node.map.info.height,
                 resolution=self.ros_node.map.info.resolution
             )
-
-            return map
+            return jsonify(map_data.dict())
 
         # Get cmd vel commands from frontend
-        @self.app.post("/cmd_vel_button_key/")
-        async def read_root(cmd_vel_button_key: CmdVelButtonKey):
+        @self.app.route("/cmd_vel_button_key/", methods=["POST"])
+        def cmd_vel_button_key():
+            try:
+                # Validieren und in CmdVelButtonKey umwandeln
+                cmd_vel_button_key = CmdVelButtonKey(**request.json)
+            except ValidationError as e:
+                return jsonify({"error": e.errors()}), 400
+            
             self.ros_node.logger.info(f"Received key: {cmd_vel_button_key.key}")
             self.ros_node.publish_message(self.ros_node.get_twist_msg(cmd_vel_button_key.key, 0.5))
-            # return {"message": "Received key successfully", "key": cmd_vel_button_key.key}
+            return jsonify({"message": "Received key successfully", "key": cmd_vel_button_key.key})
 
+        # Serve frontend static files (optional)
+        self.app.static_folder = "./../frontend/dist"
+        self.app.add_url_rule("/", endpoint="index", view_func=self.index)
 
-    def run(self, host="0.0.0.0", port=8000):
-        # Starten des FastAPI Servers
-        uvicorn.run(self.app, host=host, port=port)
+    def startup_event(self):
+        rclpy.init()
+        self.ros_node = WebBridge()  # WebBridge-Klasse anpassen
+        def ros_thread():
+            rclpy.spin(self.ros_node)
+        thread = threading.Thread(target=ros_thread)
+        thread.start()
+
+    def shutdown_event(self, exception=None):
+        rclpy.shutdown()
+
+    def index(self):
+        return self.app.send_static_file('index.html')
 
 
 def main():
     backend = Backend()
-    backend.run()
+    backend.app.run(host="0.0.0.0", port=8000)
+
 
 # Run the FastAPI app
 if __name__ == "__main__":

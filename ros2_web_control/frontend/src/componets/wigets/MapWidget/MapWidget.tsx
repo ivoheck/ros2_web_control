@@ -1,17 +1,26 @@
 import { useEffect, useState } from "react";
 
+interface MapState {
+    width: number;
+    height: number;
+    resolution: number;
+    data: number[];
+}
+
 function MapWidget() {
 
-    const [mapState, setMapState] = useState(null);
+    const backendURL = window.location.origin;
+
+    const [mapState, setMapState] = useState<MapState | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchMapState = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:8000/get_map/");
+                const response = await fetch(`${backendURL}/get_map/`);
                 if (!response.ok) {
-                    throw new Error("Error fetching battery state");
+                    throw new Error("Error map data");
                 }
                 const data = await response.json();
                 setMapState(data);
@@ -34,12 +43,12 @@ function MapWidget() {
     }
 
     if (mapState === null) {
-        return <div>No Map state available</div>;
+        return <div>No Map available</div>;
     }
 
     return (
         <>
-            <h1>{mapState}</h1>
+            <h1>{mapState.data}</h1>
         </>
     );
 }

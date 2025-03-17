@@ -29,7 +29,7 @@ const BottomBar: React.FC<BottomBarProps> = ({ currentPage: string }) => {
                 <button className={`bar-button ${isMapSelected && 'bar-button-selected'}`} onClick={() => navigate('/map')}>
                     <FaMapMarkedAlt />
                 </button>
-                <button className={`bar-button ${isCmdVelControlSelected && 'bar-button-selected'}`} onClick={() => navigate('/')}>
+                <button className={`bar-button ${isCmdVelControlSelected && 'bar-button-selected'}`} onClick={() => navigate('/page')}>
                     <IoGameController />
                 </button>
                 <button className={`bar-button ${isBatterySelected && 'bar-button-selected'}`} onClick={() => navigate('/battery')}>
