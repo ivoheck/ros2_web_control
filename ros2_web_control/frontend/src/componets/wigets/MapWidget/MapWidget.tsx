@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import MapField from "./MapField";
+import './MapWidget.css';
 
 interface MapState {
     width: number;
@@ -43,12 +45,25 @@ function MapWidget() {
     }
 
     if (mapState === null) {
-        return <div>No Map available</div>;
+        return <div className="nomap">No map available. Make sure to publish a OccupancyGrid message on the /map topic</div>;
     }
+
+    console.log(mapState.width);
+    console.log(mapState.height);
 
     return (
         <>
-            <h1>{mapState.data}</h1>
+            <div className="map-grid"
+                style={{
+                    gridTemplateColumns: `repeat(${mapState.width}, 1fr)`,
+                    gridTemplateRows: `repeat(${mapState.height}, 1fr)`,
+                }}
+            >
+                {mapState.data.map((value) => (
+                    <MapField fielStatus={value} ></MapField>
+                ))
+                }
+            </div>
         </>
     );
 }

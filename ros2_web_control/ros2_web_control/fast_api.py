@@ -13,13 +13,15 @@ from rclpy.node import Node
 from sensor_msgs.msg import BatteryState
 from nav_msgs.msg import OccupancyGrid
 
+from get_ip import get_local_ip
+
 #ROS 2 Node
 class WebBrige(Node):
     def __init__(self):
         super().__init__('web_bridge')
         self.publisher_cmd_vel = self.create_publisher(Twist, '/cmd_vel_unstamped', 1)
 
-        # self.subscriber_battery_state = self.create_subscription(BatteryState, '/battery_state', self.battery_state_callback, 1)
+        self.subscriber_battery_state = self.create_subscription(BatteryState, '/battery_state', self.battery_state_callback, 1)
         self.battery_state: BatteryState = None
 
         self.sub_map = self.create_subscription(OccupancyGrid, '/map', self.map_callback, 1)
@@ -69,10 +71,10 @@ class WebBrige(Node):
         
         return msg
 
-class CmdVelButtonKey(BaseModel):
+class CmdVelButtonKeyModel(BaseModel):
     key: int
 
-class BatteryState(BaseModel):
+class BatteryStateModel(BaseModel):
     voltage: float
     percentage: float
     current: float
@@ -80,7 +82,7 @@ class BatteryState(BaseModel):
     capacity: float
     design_capacity: float
 
-class Map(BaseModel):
+class MapModel(BaseModel):
     data: list
     width: int
     height: int
@@ -123,7 +125,7 @@ class Backend:
 
         # Routen in der Klasse definieren
         @self.app.post("/cmd_vel_button_key/")
-        async def read_root(cmd_vel_button_key: CmdVelButtonKey):
+        async def read_root(cmd_vel_button_key: CmdVelButtonKeyModel):
             ros_node = self.app.state.ros_node
             ros_node.logger.info(f"Received key: {cmd_vel_button_key.key}")
             ros_node.publish_message(ros_node.get_twist_msg(cmd_vel_button_key.key, 0.5))
@@ -136,13 +138,9 @@ class Backend:
             map = self.app.state.ros_node.map
             return_map = None
 
-            print(map)
-            
-            # if map is None:
-            #     return {"message": "No map available"}
             if map is not None:
                 
-                return_map = Map(
+                return_map = MapModel(
                     data=map.data,
                     width=map.info.width or 0,
                     height=map.info.height or 0,
@@ -150,9 +148,32 @@ class Backend:
                 )
 
             return return_map
+        
+        # Get battery state from backend
+        @self.app.get("/get_battery_state/")
+        async def read_root():
+            battery_state = self.app.state.ros_node.battery_state
+            return_battery_state = None
+
+            if battery_state is not None:
+            
+                return_battery_state = BatteryStateModel(
+                    voltage=battery_state.voltage or 0.0,
+                    percentage=battery_state.percentage or 0.0,
+                    current=battery_state.current or 0.0,
+                    charge=battery_state.charge or 0.0,
+                    capacity=battery_state.capacity or 0.0,
+                    design_capacity=battery_state.design_capacity or 0.0
+                )
+
+            return return_battery_state
+        
 
     def run(self, host="0.0.0.0", port=8000):
+        print(f"running on: {get_local_ip()} port: {port} /page/")
         uvicorn.run(self.app, host=host, port=port)
+        
+
 
 def main():
     backend = Backend()
