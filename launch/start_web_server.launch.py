@@ -15,11 +15,11 @@ def generate_launch_description():
     #         shell=True,  
     #     )
     
-    backend_node = Node(
+    fast_api_node = Node(
        package='ros2_web_control',
-       executable='backend_node',
+       executable='fast_api_node',
     )
 
     return LaunchDescription([
-        backend_node
+        fast_api_node,
     ])

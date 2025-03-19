@@ -6,14 +6,24 @@ from fastapi.responses import FileResponse
 import threading
 import uvicorn
 from contextlib import asynccontextmanager
+import os
 
 import rclpy
 from geometry_msgs.msg import Twist
 from rclpy.node import Node
 from sensor_msgs.msg import BatteryState
 from nav_msgs.msg import OccupancyGrid
+from ament_index_python.packages import get_package_share_directory
 
-from get_ip import get_local_ip
+from ros2_web_control.get_ip import get_local_ip
+
+class Logger(Node):
+    def __init__(self):
+        super().__init__('logger')
+        self.logger = self.get_logger() 
+
+    def log_info(self, message):
+        self.logger.info(message)
 
 #ROS 2 Node
 class WebBrige(Node):
@@ -91,7 +101,6 @@ class MapModel(BaseModel):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup logic
-    rclpy.init()
     ros_node = WebBrige()
 
     def ros_thread():
@@ -119,7 +128,9 @@ class Backend:
             allow_headers=["*"],  
         )
 
-        app_path = "./../frontend/dist"
+        package_share_directory = get_package_share_directory('ros2_web_control')
+        app_path = os.path.join(package_share_directory, 'frontend', 'dist')
+        
         self.app.mount("/page/", StaticFiles(directory=app_path, html=True), name="react-app")
 
 
@@ -168,14 +179,14 @@ class Backend:
 
             return return_battery_state
         
-
     def run(self, host="0.0.0.0", port=8000):
-        print(f"running on: {get_local_ip()} port: {port} /page/")
+        logger_node = Logger()
+        logger_node.log_info(f"Running on: {get_local_ip()} port: 8000 endpoint: /page/")
         uvicorn.run(self.app, host=host, port=port)
         
 
-
 def main():
+    rclpy.init()
     backend = Backend()
     backend.run()
 

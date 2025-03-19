@@ -30,7 +30,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            f'backend_node = {package_name}.backend:main',
+            f'fast_api_node = {package_name}.fast_api:main',
         ],
     },
 )
