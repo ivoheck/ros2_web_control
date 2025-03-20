@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import Response
 import threading
 import uvicorn
 from contextlib import asynccontextmanager
@@ -14,6 +14,11 @@ from rclpy.node import Node
 from sensor_msgs.msg import BatteryState
 from nav_msgs.msg import OccupancyGrid
 from ament_index_python.packages import get_package_share_directory
+from sensor_msgs.msg import Image
+
+import cv2
+from cv_bridge import CvBridge
+
 
 from ros2_web_control.get_ip import get_local_ip
 
@@ -37,7 +42,13 @@ class WebBrige(Node):
         self.sub_map = self.create_subscription(OccupancyGrid, '/map', self.map_callback, 1)
         self.map: OccupancyGrid = None
 
+        self.sub_camera = self.create_subscription(Image, '/camera/image_raw', self.camera_callback, 1)
+        self.camera_image: Image = None
+
         self.logger = self.get_logger()
+
+    def camera_callback(self, msg: Image) -> None:
+        self.camera_image = msg
 
     def map_callback(self, msg: OccupancyGrid) -> None:
         self.map = msg
@@ -133,8 +144,6 @@ class Backend:
         
         self.app.mount("/page/", StaticFiles(directory=app_path, html=True), name="react-app")
 
-
-        # Routen in der Klasse definieren
         @self.app.post("/cmd_vel_button_key/")
         async def read_root(cmd_vel_button_key: CmdVelButtonKeyModel):
             ros_node = self.app.state.ros_node
@@ -178,6 +187,20 @@ class Backend:
                 )
 
             return return_battery_state
+        
+
+        # Get camera image from backend
+        @self.app.get("/get_camera_image/")
+        async def read_root():
+            camera_image: Image = self.app.state.ros_node.camera_image
+
+            if camera_image is not None:
+                cv_image = CvBridge().imgmsg_to_cv2(camera_image, desired_encoding="bgr8")
+                _, buffer = cv2.imencode(".jpg", cv_image)
+                return Response(content=buffer.tobytes(), media_type="image/jpeg")
+
+            else:
+                return None
         
     def run(self, host="0.0.0.0", port=8000):
         logger_node = Logger()
