@@ -34,7 +34,9 @@ function BatteryWidget() {
             }
         };
 
-        fetchBatteryState();
+        const intervalId = setInterval(fetchBatteryState, 1000);
+
+        return () => clearInterval(intervalId);
     }, []);
 
     if (loading) {

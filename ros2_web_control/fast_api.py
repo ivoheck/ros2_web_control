@@ -139,8 +139,10 @@ class Backend:
             allow_headers=["*"],  
         )
 
-        package_share_directory = get_package_share_directory('ros2_web_control')
-        app_path = os.path.join(package_share_directory, 'frontend', 'dist')
+        # package_share_directory = get_package_share_directory('ros2_web_control')
+        # app_path = os.path.join(package_share_directory, 'frontend', 'dist')
+
+        app_path = "./../frontend/dist"
         
         self.app.mount("/page/", StaticFiles(directory=app_path, html=True), name="react-app")
 
@@ -202,6 +204,7 @@ class Backend:
             else:
                 return None
         
+
     def run(self, host="0.0.0.0", port=8000):
         logger_node = Logger()
         logger_node.log_info(f"Running on: {get_local_ip()} port: 8000 endpoint: /page/")

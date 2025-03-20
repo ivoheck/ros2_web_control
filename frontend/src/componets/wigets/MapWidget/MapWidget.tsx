@@ -33,7 +33,9 @@ function MapWidget() {
             }
         };
 
-        fetchMapState();
+        const intervalId = setInterval(fetchMapState, 1000);
+
+        return () => clearInterval(intervalId);
     }, []);
 
     if (loading) {

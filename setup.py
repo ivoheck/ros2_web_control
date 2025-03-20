@@ -5,8 +5,13 @@ import os
 package_name = 'ros2_web_control'
 
 # Get all files in frontend folder for building package
-frontend_files = glob('frontend/**/*', recursive=True)
-frontend_files = [f for f in frontend_files if os.path.isfile(f)]
+frontend_src = 'frontend/dist'
+frontend_dest = os.path.join('share', package_name, 'frontend/dist')
+
+frontend_files = [
+    (os.path.join(frontend_dest, os.path.relpath(os.path.dirname(f), frontend_src)), [f])
+    for f in glob(f'{frontend_src}/**/*', recursive=True) if os.path.isfile(f)
+]
 
 setup(
     name=package_name,
@@ -19,8 +24,7 @@ setup(
         ('share/' + package_name + '/launch', [
             'launch/start_web_server.launch.py',
         ]),
-        ('share/' + package_name + '/frontend', frontend_files),
-    ],
+    ] + frontend_files,
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='ivo',
