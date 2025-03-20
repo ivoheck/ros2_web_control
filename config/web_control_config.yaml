@@ -1,0 +1,7 @@
+web_bridge:
+  ros__parameters:
+    twist_topic: /cmd_vel_unstamped
+    twist_speed: 0.5
+    battery_state_topic: /battery_state
+    occupancy_grid_topic: /map
+    image_topic: /camera/image_raw

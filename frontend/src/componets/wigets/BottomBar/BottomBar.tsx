@@ -2,7 +2,6 @@ import './BottomBar.css';
 import { IoGameController } from "react-icons/io5";
 import { FaBatteryThreeQuarters } from "react-icons/fa6";
 import { FaMapMarkedAlt } from "react-icons/fa";
-//import { IoMdSettings } from "react-icons/io";
 import { FaCamera } from "react-icons/fa";
 
 import { useNavigate } from "react-router-dom";
@@ -29,7 +28,7 @@ const BottomBar: React.FC<BottomBarProps> = ({ currentPage: string }) => {
                 <button className={`bar-button ${isMapSelected && 'bar-button-selected'}`} onClick={() => navigate('/map')}>
                     <FaMapMarkedAlt />
                 </button>
-                <button className={`bar-button ${isCmdVelControlSelected && 'bar-button-selected'}`} onClick={() => navigate('/page')}>
+                <button className={`bar-button ${isCmdVelControlSelected && 'bar-button-selected'}`} onClick={() => navigate('/cmd_vel')}>
                     <IoGameController />
                 </button>
                 <button className={`bar-button ${isBatterySelected && 'bar-button-selected'}`} onClick={() => navigate('/battery')}>

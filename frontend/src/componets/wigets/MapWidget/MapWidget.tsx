@@ -13,6 +13,8 @@ function MapWidget() {
 
     const backendURL = window.location.origin;
 
+    console.log(backendURL);
+
     const [mapState, setMapState] = useState<MapState | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -47,11 +49,8 @@ function MapWidget() {
     }
 
     if (mapState === null) {
-        return <div className="nomap">No map available. Make sure to publish a OccupancyGrid message on the /map topic</div>;
+        return <div className="nomap">No map available. Make sure to publish an OccupancyGrid message on the specified topic</div>;
     }
-
-    console.log(mapState.width);
-    console.log(mapState.height);
 
     return (
         <>

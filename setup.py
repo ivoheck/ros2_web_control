@@ -24,6 +24,9 @@ setup(
         ('share/' + package_name + '/launch', [
             'launch/start_web_server.launch.py',
         ]),
+        ('share/' + package_name + '/config', [
+            'config/web_control_config.yaml',
+        ]),
     ] + frontend_files,
     install_requires=['setuptools'],
     zip_safe=True,
