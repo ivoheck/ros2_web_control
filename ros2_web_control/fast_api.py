@@ -168,7 +168,7 @@ class Backend:
             if map is not None:
                 
                 return_map = MapModel(
-                    data=map.data,
+                    data=list(map.data) or [],
                     width=map.info.width or 0,
                     height=map.info.height or 0,
                     resolution=map.info.resolution or 0.0
