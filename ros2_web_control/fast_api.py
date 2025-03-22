@@ -2,13 +2,10 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from starlette.responses import FileResponse
 from fastapi.responses import Response
 import threading
 import uvicorn
 from contextlib import asynccontextmanager
-import cv2
-from cv_bridge import CvBridge
 import os
 
 import rclpy
@@ -18,6 +15,8 @@ from sensor_msgs.msg import BatteryState
 from nav_msgs.msg import OccupancyGrid
 from ament_index_python.packages import get_package_share_directory
 from sensor_msgs.msg import Image
+import cv2
+from cv_bridge import CvBridge
 
 from ros2_web_control.get_ip import get_local_ip
 
@@ -147,6 +146,7 @@ class Backend:
 
         package_share_directory = get_package_share_directory('ros2_web_control')
         app_path = os.path.join(package_share_directory, 'frontend', 'dist')
+
 
         # app_path = "./../frontend/dist"
         
