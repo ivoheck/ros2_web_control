@@ -19,6 +19,7 @@ function MapWidget() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [scale, setScale] = useState(1);
 
     useEffect(() => {
         const fetchMapState = async () => {
@@ -50,8 +51,10 @@ function MapWidget() {
 
         const { width, height, data } = mapState;
 
-        canvas.width = width;
-        canvas.height = height;
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
         const imageData = ctx.createImageData(width, height);
 
         for (let i = 0; i < data.length; i++) {
@@ -68,6 +71,14 @@ function MapWidget() {
         ctx.putImageData(imageData, 0, 0);
     }, [mapState]);
 
+    const handleWheel = (event: React.WheelEvent) => {
+        event.preventDefault();
+        const zoomSpeed = 0.1;
+        let newScale = scale + event.deltaY * -zoomSpeed;
+        newScale = Math.min(Math.max(0.1, newScale), 5);  // Zoombegrenzung
+        setScale(newScale);
+    };
+
     if (loading) {
         return <div>Loding...</div>;
     }
@@ -82,7 +93,12 @@ function MapWidget() {
 
     return (
         <>
-            <canvas ref={canvasRef} style={{ width: "100%", height: "auto" }} />
+
+            <canvas
+                ref={canvasRef}
+                style={{ width: "100%", height: "auto", border: "1px solid black" }}
+            />
+
         </>
     );
 }
