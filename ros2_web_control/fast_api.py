@@ -209,8 +209,8 @@ class Backend:
                 return None
         
     def run(self, host="0.0.0.0", port=8000):
-        logger_node = Logger()
-        logger_node.log_info(f"Running on: {get_local_ip()} port: 8000 endpoint: /cmd_vel/")
+        self.logger_node = Logger()
+        self.logger_node.log_info(f"Running on: {get_local_ip()} port: 8000 endpoint: /cmd_vel/")
         uvicorn.run(self.app, host=host, port=port)
         
 

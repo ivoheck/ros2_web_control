@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import MapField from "./MapField";
+import { useEffect, useState, useRef } from "react";
+// import MapField from "./MapField";
 import './MapWidget.css';
 
 interface MapState {
@@ -18,6 +18,7 @@ function MapWidget() {
     const [mapState, setMapState] = useState<MapState | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
         const fetchMapState = async () => {
@@ -40,6 +41,33 @@ function MapWidget() {
         return () => clearInterval(intervalId);
     }, []);
 
+    useEffect(() => {
+        if (!mapState || !canvasRef.current) return;
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        const { width, height, data } = mapState;
+
+        canvas.width = width;
+        canvas.height = height;
+        const imageData = ctx.createImageData(width, height);
+
+        for (let i = 0; i < data.length; i++) {
+            const value = data[i];
+
+            const color = value === 100 ? [0, 0, 0] : value === 0 ? [255, 255, 255] : [150, 150, 150];
+
+            imageData.data[i * 4] = color[0];
+            imageData.data[i * 4 + 1] = color[1];
+            imageData.data[i * 4 + 2] = color[2];
+            imageData.data[i * 4 + 3] = 255;
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+    }, [mapState]);
+
     if (loading) {
         return <div>Loding...</div>;
     }
@@ -54,17 +82,7 @@ function MapWidget() {
 
     return (
         <>
-            <div className="map-grid"
-                style={{
-                    gridTemplateColumns: `repeat(${mapState.width}, 1fr)`,
-                    gridTemplateRows: `repeat(${mapState.height}, 1fr)`,
-                }}
-            >
-                {mapState.data.map((value) => (
-                    <MapField fielStatus={value} ></MapField>
-                ))
-                }
-            </div>
+            <canvas ref={canvasRef} style={{ width: "100%", height: "auto" }} />
         </>
     );
 }

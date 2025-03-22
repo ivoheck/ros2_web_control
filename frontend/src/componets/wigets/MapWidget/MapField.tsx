@@ -12,7 +12,7 @@ const MapField: React.FC<MapFieldProps> = ({ fielStatus }) => {
                     <div className="map-field unoccupied"></div>
                 </>
             );
-        case 1:
+        case 100:
             return (
                 <>
                     <div className="map-field occupied"></div>
