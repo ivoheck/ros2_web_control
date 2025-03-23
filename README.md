@@ -46,7 +46,9 @@ Build Package<br>
 `colcon build --packages-select ros2_web_control`
 
 Install Required Packages<br>
-`sudo apt install python3-fastapi`
+`sudo apt install python3-fastapi`<br>
+`sudo apt install python3-netifaces`<br>
+`sudo apt install python3-opencv`<br>
 
 Start Web Server<br>
 `ros2 launch ros2_web_control start_web_server.launch.py`
