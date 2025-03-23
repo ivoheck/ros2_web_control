@@ -11,14 +11,6 @@ This ROS 2 package provides a local web server that runs on the robot, offering 
     <img src="https://github.com/user-attachments/assets/cb975c30-fc79-4488-9135-2ba50efbeb55" alt="Screenshot_20250322-200413" width="400"/>
 </div>
 
-### 🗺️ Live OccupancyGrid Visualization
-- View the robot’s mapped environment dynamically.
-<br>
-
-<div align="center">
-<img src="https://github.com/user-attachments/assets/99624b03-7653-4046-a14d-083fde5c4d3c" alt="Screenshot_20250322-200413" width="400"/>
-</div>
-
 ### 📷 Live Camera Feed
 - Stream real-time video from the robot’s camera.
 <br>
@@ -33,6 +25,14 @@ This ROS 2 package provides a local web server that runs on the robot, offering 
 
 <div align="center">
 <img src="https://github.com/user-attachments/assets/b7ae1e3e-df43-46d4-b413-3e179dcc4db1" alt="Screenshot_20250322-200413" width="400"/>
+</div>
+
+### 🗺️ Live OccupancyGrid Visualization
+- View the robot’s mapped environment dynamically.
+<br>
+
+<div align="center">
+<img src="https://github.com/user-attachments/assets/99624b03-7653-4046-a14d-083fde5c4d3c" alt="Screenshot_20250322-200413" width="400"/>
 </div>
 
 <br>
