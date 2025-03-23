@@ -5,6 +5,3 @@ web_bridge:
     battery_state_topic: /battery_state
     occupancy_grid_topic: /map
     image_topic: /depth_camera/image_raw
-
-
-#python3-fastapi

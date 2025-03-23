@@ -44,7 +44,7 @@ function CameraWidget() {
 
     return (
         <>
-            {picture && <img src={picture} alt="No Image available" />}
+            {picture && <img src={picture} alt="No Image available" style={{ maxWidth: "100%", height: "auto", objectFit: "contain" }} />}
         </>
     );
 }
