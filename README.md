@@ -45,10 +45,13 @@ Clone Repository<br>
 Build Package<br>
 `colcon build --packages-select ros2_web_control`
 
+Install Required Packages<br>
+`sudo apt install python3-fastapi`
+
 Start Web Server<br>
 `ros2 launch ros2_web_control start_web_server.launch.py`
 
-The web server is hosted on the robot's local IP at port 8000. The interface can be accessed via the following endpoint: /cmd_vel.
+The web server is hosted on the robot's local IP at port 8000. The interface can be accessed via the following endpoint: /cmd_vel
 `http://<local-ip>:8000/cmd_vel/`
 
 ## Configuration<br>
